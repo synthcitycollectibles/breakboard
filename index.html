@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Break Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font-family:Inter,system-ui,sans-serif;color:#fff;background:#070b24}
+.sky{background-color:#070b24;background-image:
+radial-gradient(1px 1px at 12% 18%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 33% 72%,#fff 50%,transparent 51%),
+radial-gradient(1.5px 1.5px at 58% 26%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 81% 64%,#fff 50%,transparent 51%),
+radial-gradient(1.5px 1.5px at 91% 12%,#ffe9a8 50%,transparent 51%),radial-gradient(1px 1px at 6% 88%,#fff 50%,transparent 51%),
+radial-gradient(1px 1px at 47% 94%,#cfe0ff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 70% 44%,#fff 50%,transparent 51%),
+radial-gradient(ellipse at 50% 0%,rgba(90,110,255,.28),transparent 60%),radial-gradient(ellipse at 100% 100%,rgba(200,90,255,.18),transparent 55%);
+background-size:220px 220px,260px 260px,300px 300px,240px 240px,340px 340px,280px 280px,320px 320px,260px 260px,100% 100%,100% 100%;background-attachment:fixed}
+.hidden{display:none!important}
+a{color:#ffd34d}
+button,.btn{font:inherit;font-size:14px;font-weight:500;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;cursor:pointer;text-decoration:none;display:inline-block}
+button:hover,.btn:hover{background:rgba(255,255,255,.18)}
+button:disabled{opacity:.45;cursor:default}
+button.red{background:#b3141f;border-color:#e8434d}
+button.gold,.btn.gold{background:#ffd34d;color:#2a1a00;border-color:#ffd34d}
+button.sm{padding:5px 9px;font-size:13px}
+input[type=text],input[type=search],textarea{width:100%;font:inherit;font-size:15px;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:9px 10px}
+textarea{min-height:140px;resize:vertical}
+select{width:100%;font:inherit;font-size:15px;color:#fff;background:#1c2357;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:9px 10px}
+
+#app{max-width:1100px;margin:0 auto;padding:12px 14px 90px}
+nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:14px}
+nav .brand{font-family:Anton,Impact,sans-serif;font-size:22px;letter-spacing:.03em;margin-right:10px}
+nav a.tab{color:#c8cdf0;text-decoration:none;padding:7px 11px;border-radius:8px;font-size:14px;font-weight:500}
+nav a.tab.on{background:rgba(255,255,255,.14);color:#fff}
+h1{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:28px;margin:0;letter-spacing:.02em}
+h2{font-size:17px;margin:20px 0 8px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{background:#ffd34d;color:#2a1a00;font-weight:600;border-radius:999px;padding:4px 12px;font-size:14px;white-space:nowrap}
+.tag{font-size:12px;background:rgba(255,255,255,.12);border-radius:999px;padding:2px 9px;color:#dfe3ff;white-space:nowrap}
+.muted{color:#c8cdf0;font-size:13px;line-height:1.5}
+.banner{font-size:14px;line-height:1.5;background:rgba(255,211,77,.12);border:1px solid rgba(255,211,77,.45);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.banner .btns{margin-top:8px}
+.card{background:rgba(20,26,68,.85);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:16px;margin-bottom:12px}
+.list{display:flex;flex-direction:column;gap:6px}
+.li{display:flex;align-items:center;gap:10px;background:rgba(20,26,68,.85);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 12px;flex-wrap:wrap}
+.li .grow{flex:1;min-width:160px}
+.li .t{font-weight:600;font-size:15px}
+.folders{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.folder{display:flex;align-items:center;gap:12px;background:rgba(20,26,68,.85);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:14px;color:#fff;text-decoration:none}
+.folder:hover{background:rgba(40,50,120,.9);border-color:rgba(255,211,77,.6)}
+.folder .ficon{font-size:26px}.folder .grow{flex:1;min-width:0}.folder .t{font-weight:600;font-size:16px}.folder .chev{font-size:22px;color:#c8cdf0}
+.crumbs{font-size:14px;color:#c8cdf0;margin:-4px 0 12px}.crumbs b{color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.chip{font:inherit;font-size:13px;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#dfe3ff;cursor:pointer}
+.chip.on{background:#ffd34d;color:#2a1a00;border-color:#ffd34d}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.tile{position:relative;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:linear-gradient(160deg,#2b3a8f,#151d52);border:2px solid rgba(255,255,255,.15);cursor:pointer;display:flex;align-items:flex-end;user-select:none}
+.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile .lb{position:relative;width:100%;font-size:12px;font-weight:600;line-height:1.2;text-align:center;padding:14px 4px 6px;background:linear-gradient(transparent,rgba(0,0,0,.85) 40%)}
+.tile.noimg{align-items:center}.tile.noimg .lb{background:none;padding:6px}
+
+/* board */
+#board{position:fixed;inset:0;overflow:hidden;cursor:default}
+#bHead{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:2%;padding:0 2%}
+#bTitle{font-family:Anton,Impact,sans-serif;letter-spacing:.02em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 0 rgba(0,0,0,.4)}
+#bLeft{font-family:Anton,Impact,sans-serif;background:#ffd34d;color:#2a1a00;border-radius:999px;padding:.15em .7em;white-space:nowrap}
+#bGrid{position:absolute;display:flex;flex-wrap:wrap;justify-content:center;align-content:center}
+#bGrid .st{flex:0 0 auto;width:var(--tw);height:var(--th)}
+.st{position:relative;border-radius:10%/12%;overflow:hidden;background:linear-gradient(160deg,#2b3a8f,#151d52);border:2px solid rgba(255,255,255,.18);display:flex;align-items:flex-end;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.st img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.st .lb{position:relative;width:100%;text-align:center;font-family:Anton,Impact,sans-serif;line-height:1.05;padding:4% 4% 5%;background:linear-gradient(transparent,rgba(0,0,0,.85) 45%);text-shadow:0 1px 2px #000;pointer-events:none}
+.st.noimg{align-items:center}.st.noimg .lb{background:none;padding:6%}
+.st.sold{border-color:#ff4d4d}
+.st.sold img,.st.sold .lb{filter:grayscale(.85) brightness(.55)}
+.stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.stamp b{font-family:Anton,Impact,sans-serif;color:#fff;background:#d81f2a;border:3px solid #fff;border-radius:6px;padding:.05em .35em;transform:rotate(-12deg);letter-spacing:.06em;box-shadow:0 3px 10px rgba(0,0,0,.5)}
+#bFoot,#bTopP{position:absolute;left:0;right:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1%;padding:0 2%}
+#bFoot span,#bTopP span{font-family:Anton,Impact,sans-serif;background:#000;border:2px solid rgba(255,255,255,.25);border-radius:999px;padding:.12em .8em;white-space:nowrap}
+#bCtl{position:absolute;top:0;left:0;right:0;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px;background:rgba(5,8,30,.92);border-bottom:1px solid rgba(255,255,255,.2);transform:translateY(-110%);transition:transform .15s;z-index:5}
+#bCtl.show{transform:none}
+#bCtl .hint{font-size:12px;color:#c8cdf0}
+#bHot{position:absolute;top:0;left:0;right:0;height:14px;z-index:4}
+
+.veil{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+@media(min-width:700px){.veil{align-items:center}}
+.sheet{background:#141a44;border:1px solid rgba(255,255,255,.18);border-radius:16px;width:min(520px,100%);padding:18px;max-height:92vh;overflow:auto}
+.sheet h2{margin:0 0 6px}
+.sheet label{display:block;font-size:13px;color:#c8cdf0;margin:12px 0 6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.row>*{flex:1}
+.prev{width:120px;height:120px;border-radius:10px;object-fit:cover;display:block;margin:6px 0}
+.msg{font-size:13px;margin-top:10px;color:#ffd34d;line-height:1.5}
+.err{color:#ff8a8a}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#000;border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:10px 14px;font-size:14px;z-index:20;max-width:90vw}
+</style>
+<script src="config.js"></script>
+</head>
+<body class="sky">
+
+<div id="board" class="hidden">
+  <div id="bHot"></div>
+  <div id="bCtl">
+    <a class="btn" href="#/">← Breaks</a>
+    <button id="bReset" class="red">Clear all SOLD</button>
+    <button id="bSort">Sold spots move to the end: On</button>
+    <button id="bEdit">Title, prices &amp; layout</button>
+    <span class="hint">Click a spot to mark it SOLD · click again to undo · move the mouse to the top edge to show this bar</span>
+  </div>
+  <div id="bHead"><div id="bTitle"></div><div id="bLeft"></div></div>
+  <div id="bGrid"></div>
+  <div id="bTopP" class="hidden"></div>
+  <div id="bFoot"></div>
+</div>
+
+<div id="app" class="hidden">
+  <nav>
+    <span class="brand">Break Board</span>
+    <a class="tab" href="#/" data-tab="breaks">Breaks</a>
+    <a class="tab" href="#/spots" data-tab="spots">Spots &amp; pictures</a>
+    <a class="tab" href="#/team" data-tab="team">Team</a>
+    <span style="flex:1"></span>
+    <span id="who"></span>
+  </nav>
+  <div id="view"></div>
+</div>
+
+<div id="veil" class="veil hidden"><div class="sheet" id="sheet"></div></div>
+<div id="toast" class="hidden"></div>
+<input type="file" id="fileOne" accept="image/*" class="hidden">
+<input type="file" id="fileBulk" accept="image/*" multiple class="hidden">
+<input type="file" id="fileLib" accept=".json,application/json" class="hidden">
+<script>
+(async function(){
+/* ================= helpers ================= */
+const CFG = window.BREAK_BOARD_CONFIG || {};
+const FIREBASE = CFG.firebase && CFG.firebase.apiKey ? CFG.firebase : null;
+const FB_VER = '10.12.2';
+const $ = id => document.getElementById(id);
+const slug = s => String(s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,90) || 'x';
+const norm = s => String(s).toLowerCase().replace(/\.[a-z0-9]+$/,'').replace(/&/g,'and').replace(/[^a-z0-9]/g,'');
+function h(tag, props, ...kids){ const e = document.createElement(tag); if (props) for (const [k,v] of Object.entries(props)){ if (k === 'on') for (const [ev,fn] of Object.entries(v)) e.addEventListener(ev, fn); else if (k === 'list' || !(k in e)) e.setAttribute(k, v); else e[k] = v; } kids.flat().forEach(k => k != null && e.append(k)); return e; }
+let toastT; function toast(t, bad){ const el = $('toast'); el.textContent = t; el.classList.remove('hidden'); el.style.color = bad ? '#ff8a8a' : '#fff'; clearTimeout(toastT); toastT = setTimeout(() => el.classList.add('hidden'), 3500); }
+function openSheet(build){ const sh = $('sheet'); sh.innerHTML = ''; build(sh); $('veil').classList.remove('hidden'); }
+function closeSheet(){ $('veil').classList.add('hidden'); $('sheet').innerHTML = ''; }
+$('veil').addEventListener('click', e => { if (e.target.id === 'veil') closeSheet(); });
+function confirmSheet(title, text, okLabel, onOk){ openSheet(sh => { sh.append(h('h2',{textContent:title}), h('p',{className:'muted',textContent:text}), h('div',{className:'row'}, h('button',{className:'red',textContent:okLabel,on:{click:()=>{closeSheet(); onOk();}}}), h('button',{textContent:'Cancel',on:{click:closeSheet}}))); }); }
+const linesOf = t => String(t||'').split('\n').map(x => x.trim()).filter(Boolean);
+async function resizeImage(file){
+  const bmp = await createImageBitmap(file);
+  const max = 320, sc = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width*sc); c.height = Math.round(bmp.height*sc);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.8);
+}
+
+/* ================= this computer's storage (board state; library in local mode) ================= */
+const mem = {};
+const idb = await new Promise(res => { try { const r = indexedDB.open('breakboard', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch(e){ res(null); } });
+function kvGet(k){ if (!idb) return Promise.resolve(mem[k]); return new Promise(res => { try { const r = idb.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(undefined); } catch(e){ res(undefined); } }); }
+function kvSet(k, v){ mem[k] = v; if (!idb) return Promise.resolve(); return new Promise(res => { try { const t = idb.transaction('kv', 'readwrite'); if (v === undefined) t.objectStore('kv').delete(k); else t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = () => { toast('Couldn\'t save on this computer.', true); res(); }; } catch(e){ res(); } }); }
+
+/* ================= library store =================
+   index = { spots: {id: {name, group, v}}, breaks: {id: {title, franchise, product, style, spotIds, prices}} }
+   images live separately, one per spot, fetched only when needed. v = picture version (0 = none). */
+const store = FIREBASE ? await firebaseStore() : await localStore();
+
+async function firebaseStore(){
+  const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+  const [A, F, U] = await Promise.all([import(base+'firebase-app.js'), import(base+'firebase-firestore.js'), import(base+'firebase-auth.js')]);
+  const app = A.initializeApp(FIREBASE), db = F.getFirestore(app), auth = U.getAuth(app);
+  const idxRef = F.doc(db, 'library', 'index');
+  let exists = false, signed = false; const authCbs = new Set();
+  U.onAuthStateChanged(auth, u => { signed = !!u; authCbs.forEach(cb => cb()); });
+  const fail = e => { console.error(e); const perm = /permission/i.test((e && (e.code || e.message)) || ''); toast(perm ? 'Only the team can edit. Sign in with the team password first.' : 'Couldn\'t save. Check your internet.', true); throw e; };
+  async function ensure(){ if (!exists){ await F.setDoc(idxRef, {spots: {}, breaks: {}}, {merge: true}); exists = true; } }
+  return {
+    mode: 'team',
+    onIndex(cb){ F.onSnapshot(idxRef, s => { exists = s.exists(); const d = s.exists() ? s.data() : {}; cb({spots: d.spots || {}, breaks: d.breaks || {}}); }, e => { toast('Can\'t reach the team library. Check your internet.', true); cb(null); }); },
+    async putBreak(id, b){ try { await ensure(); await F.updateDoc(idxRef, new F.FieldPath('breaks', id), b === null ? F.deleteField() : b); } catch(e){ fail(e); } },
+    async putSpot(id, s){ try { await ensure(); await F.updateDoc(idxRef, new F.FieldPath('spots', id), s === null ? F.deleteField() : s); } catch(e){ fail(e); } },
+    async putImage(id, img){ try { if (img) await F.setDoc(F.doc(db, 'images', id), {img}); else await F.deleteDoc(F.doc(db, 'images', id)); } catch(e){ fail(e); } },
+    async getImages(ids){
+      const out = {}; const u = [...new Set(ids)];
+      for (let i = 0; i < u.length; i += 30){ const snap = await F.getDocs(F.query(F.collection(db, 'images'), F.where(F.documentId(), 'in', u.slice(i, i+30)))); snap.forEach(d => out[d.id] = d.data().img); }
+      return out;
+    },
+    signedIn: () => signed, onAuth: cb => { authCbs.add(cb); },
+    signIn: pw => U.signInWithEmailAndPassword(auth, CFG.teamEmail, pw), signOut: () => U.signOut(auth),
+  };
+}
+
+async function localStore(){
+  // No Firebase set up yet: library lives in this browser only. Tabs of the same browser stay in sync.
+  let index = (await kvGet('index')) || null;
+  const chan = 'BroadcastChannel' in window ? new BroadcastChannel('breakboard') : null;
+  let cb = null;
+  const emit = () => cb && cb(JSON.parse(JSON.stringify(index)));
+  if (chan) chan.onmessage = async () => { index = (await kvGet('index')) || index; emit(); };
+  const save = async () => { await kvSet('index', index); emit(); chan && chan.postMessage('x'); };
+  if (!index){ index = starterIndex(); await kvSet('index', index); }
+  return {
+    mode: 'local',
+    onIndex(f){ cb = f; emit(); },
+    async putBreak(id, b){ if (b === null) delete index.breaks[id]; else index.breaks[id] = b; await save(); },
+    async putSpot(id, s){ if (s === null) delete index.spots[id]; else index.spots[id] = s; await save(); },
+    async putImage(id, img){ await kvSet('img:' + id, img || undefined); },
+    async getImages(ids){ const out = {}; for (const id of ids){ const v = await kvGet('img:' + id); if (v) out[id] = v; } return out; },
+    signedIn: () => true, onAuth: () => {}, signIn: async () => {}, signOut: async () => {},
+  };
+}
+
+/* ================= starter ================= */
+function starterIndex(){
+  const D = ["A Bug's Life / Wish","Aladdin / Aladdin (2019)","Alice in Wonderland","Bambi / Brother Bear","Beauty and the Beast / Beauty and the Beast (2017)","Big Hero 6 / Bolt","Camp Rock / Wizards of Waverly Place","Cars / Planes","Chip & Dale / The Three Caballeros","Cinderella","Coco / Encanto","Daisy Duck","Darkwing Duck","Disney Channel","Donald Duck","DuckTales","Dumbo","Elio / Pete's Dragon","Enchanted / Brave","Finding Nemo / Finding Dory","Frozen / Frozen II","Goofy","Hannah Montana / Lizzie McGuire","Hercules","High School Musical","Hoppers","Inside Out / Inside Out 2","Lightyear / ALL BUZZ LIGHTYEAR","Lilo and Stitch","Mickey Mouse / Walt Disney / Fantasia","Minnie Mouse","Moana / Moana 2","Monsters, Inc.","Mulan","Peter Pan","Phineas and Ferb","Pinocchio (2022) / One Hundred and One Dalmatians","Pirates of the Caribbean","Pluto / Clarabelle / Horace","Ratatouille","Raya and the Last Dragon / Up","Snow White and the Seven Dwarfs","Tangled","The Emperor's New Groove / The Great Mouse Detective","The Fox and the Hound / Mr. Toad","The Hunchback of Notre Dame / Pocahontas","The Incredibles","The Lion King","The Little Mermaid / The Little Mermaid (2023)","The Muppets","The Princess and the Frog","Toy Story","Treasure Planet","Tron / Tron: Ares","WALL-E","Winnie the Pooh","Wreck-It Ralph / Turning Red","Zootopia / Zootopia 2"];
+  const ix = {spots: {}, breaks: {}};
+  D.forEach(n => ix.spots[slug(n)] = {name: n, group: 'Disney', v: 0});
+  ix.breaks['disney-break'] = {title: 'Disney Break', franchise: 'Disney', product: '', style: 'Disney Break', spotIds: D.map(slug), prices: []};
+  return ix;
+}
+
+/* ================= state ================= */
+let IX = null;               // library index (shared)
+let LIVE = (await kvGet('live')) || null;   // this computer's board
+const IMG = {};              // id -> {v, img}
+const saveLive = () => kvSet('live', LIVE);
+function spotFor(id){ const s = IX && IX.spots[id]; return s ? {id, ...s} : {id, name: id.replace(/-/g, ' '), v: 0}; }
+function imgFor(id){ const s = IX && IX.spots[id]; if (!s || !s.v) return ''; const c = IMG[id]; return c && c.v === s.v ? c.img : (c && c.img) || ''; }
+let imgBusy = false, imgAgain = null;
+async function ensureImages(ids){
+  if (!IX) return;
+  const need = ids.filter(id => { const s = IX.spots[id]; return s && s.v && (!IMG[id] || IMG[id].v !== s.v); });
+  if (!need.length) return;
+  if (imgBusy){ imgAgain = (imgAgain || []).concat(need); return; }
+  imgBusy = true;
+  try { const got = await store.getImages(need); need.forEach(id => { IMG[id] = {v: IX.spots[id].v, img: got[id] || ''}; }); } catch(e){ need.forEach(id => { IMG[id] = {v: IX.spots[id] ? IX.spots[id].v : 0, img: ''}; }); }
+  imgBusy = false;
+  render();
+  if (imgAgain){ const a = imgAgain; imgAgain = null; ensureImages(a); }
+}
+function canEdit(){ return store.signedIn(); }
+function needSignIn(){ if (canEdit()) return false; signInSheet(); return true; }
+function signInSheet(){
+  openSheet(sh => {
+    sh.append(h('h2', {textContent: 'Team sign in'}), h('p', {className: 'muted', textContent: 'Enter the team password to make or change boards. You stay signed in on this computer.'}));
+    const pw = h('input', {type: 'password', placeholder: 'Team password'}); const msg = h('div', {className: 'msg'});
+    const go = async () => { msg.textContent = 'Signing in…'; msg.classList.remove('err'); try { await store.signIn(pw.value); closeSheet(); toast('Signed in'); render(); } catch(e){ msg.textContent = 'That password didn\'t work.'; msg.classList.add('err'); } };
+    pw.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    sh.append(pw, msg, h('div', {className: 'row'}, h('button', {className: 'gold', textContent: 'Sign in', on: {click: go}}), h('button', {textContent: 'Cancel', on: {click: closeSheet}})));
+  });
+}
+
+/* ================= board ================= */
+const PRICE_SPOTS = [['bottom', 'Bottom'], ['top', 'Top, under the title'], ['both', 'Top and bottom (first 3 on top, rest on bottom)'], ['left', 'Left side, stacked'], ['right', 'Right side, stacked']];
+const PER_ROW = [['', 'Automatic'], ['1', '1 per row (stacked)'], ['2', '2 per row'], ['3', '3 per row'], ['4', '4 per row']];
+function perRowSelect(val){ const s = h('select', {}); PER_ROW.forEach(([v, t]) => s.append(h('option', {value: v, textContent: t, selected: v === String(val || '')}))); return s; }
+function pricesAtSelect(val){ const s = h('select', {}); PRICE_SPOTS.forEach(([v, t]) => s.append(h('option', {value: v, textContent: t, selected: v === (val || 'bottom')}))); return s; }
+/* grid: "8x7" = 8 columns × 7 rows. Blank = automatic. */
+function parseGrid(s){ const m = String(s || '').match(/^\s*(\d{1,2})\s*[x×*X]\s*(\d{1,2})\s*$/); if (!m) return null; const c = +m[1], r = +m[2]; return c >= 1 && r >= 1 && c <= 20 && r <= 20 ? {c, r} : null; }
+function gridNote(s, n){ const g = parseGrid(s); if (!g) return ''; const cap = g.c * g.r; return cap >= n ? `${g.c} across × ${g.r} down (${cap} spaces)` : `${g.c} × ${g.r} holds ${cap}, but this break has ${n} spots, so it will use ${Math.ceil(n / g.c)} rows.`; }
+function startBreak(id){
+  const b = IX.breaks[id]; if (!b) return;
+  LIVE = {breakId: id, title: b.title, spotIds: (b.spotIds || []).slice(), prices: (b.prices || []).slice(), grid: b.grid || '', pricesAt: b.pricesAt || 'bottom', pricesPerRow: b.pricesPerRow || '', soldToEnd: true, sold: {}};
+  saveLive(); location.hash = '#/board';
+}
+function fillTile(el, sp, sold, cls){
+  const img = imgFor(sp.id);
+  el.className = cls + (sold ? ' sold' : '') + (img ? '' : ' noimg');
+  el.innerHTML = '';
+  if (img) el.append(h('img', {src: img, alt: ''}));
+  const lb = h('div', {className: 'lb'}); String(sp.name).split(' / ').forEach((p, i) => { if (i) lb.append(h('br')); lb.append(p); }); el.append(lb);
+  if (sold) el.append(h('div', {className: 'stamp'}, h('b', {textContent: 'SOLD'})));
+  return el;
+}
+function boardOrder(){
+  const ids = LIVE.spotIds, sold = LIVE.sold || {};
+  if (LIVE.soldToEnd === false) return ids.slice();
+  const open = ids.filter(id => !sold[id]);                                   // open spots keep your best-to-worst order
+  const gone = ids.filter(id => sold[id]).sort((a, b) => (+sold[a] || 0) - (+sold[b] || 0)); // newest sale ends up bottom-right
+  return open.concat(gone);
+}
+const tileEls = new Map();
+function renderBoard(animate){
+  const W = innerWidth, H = innerHeight, portrait = H > W;
+  if (!LIVE || !LIVE.spotIds.length){ location.hash = '#/'; return; }
+  const ids = LIVE.spotIds, n = ids.length, sold = LIVE.sold || {};
+  ensureImages(ids);
+  const fixed = parseGrid(LIVE.grid);
+  const cols = fixed ? fixed.c : portrait ? (n <= 20 ? 4 : n <= 42 ? 5 : 6) : (n <= 24 ? 6 : n <= 40 ? 8 : n <= 60 ? 10 : 12);
+  const rows = fixed ? Math.max(fixed.r, Math.ceil(n / cols)) : Math.ceil(n / cols);
+  const m = Math.min(W, H), pad = m * 0.025, gap = m * 0.012;
+  const headH = portrait ? H * 0.075 : H * 0.095;
+  const prices = LIVE.prices || [], hasPrices = prices.length > 0;
+  const at = hasPrices ? (LIVE.pricesAt || 'bottom') : 'none';
+  const side = at === 'left' || at === 'right';
+  const longest = Math.max(1, ...prices.map(p => p.length));
+  const sideW = side ? Math.min(W * (portrait ? 0.34 : 0.22), longest * m * 0.026 + m * 0.06) : 0;
+  // top / bottom sections
+  let topItems = [], botItems = [];
+  if (at === 'top') topItems = prices; else if (at === 'bottom') botItems = prices; else if (at === 'both'){ topItems = prices.slice(0, 3); botItems = prices.slice(3); }
+  const fixedPer = parseInt(LIVE.pricesPerRow, 10) || 0;
+  const perRowFor = items => Math.max(1, fixedPer || (at === 'both' ? Math.min(3, items.length) : portrait ? Math.min(2, items.length) : Math.min(items.length, 6)));
+  const linesFor = items => items.length ? Math.ceil(items.length / perRowFor(items)) : 0;
+  const maxLines = Math.max(linesFor(topItems), linesFor(botItems));
+  const lineH = portrait ? H * 0.042 : H * (maxLines > 1 ? 0.058 : 0.072);
+  const secH = items => { const l = linesFor(items); return l ? l * lineH + (l - 1) * lineH * 0.2 : 0; };
+  const topH = secH(topItems), botH = secH(botItems);
+  const head = $('bHead'); head.style.top = pad*0.6 + 'px'; head.style.height = headH + 'px';
+  const titleSize = Math.min(headH * 0.62, W * (portrait ? 0.055 : 0.032));
+  $('bTitle').style.fontSize = titleSize + 'px'; $('bTitle').textContent = LIVE.title || '';
+  const left = ids.filter(i => !sold[i]).length;
+  $('bLeft').style.fontSize = titleSize * 0.6 + 'px'; $('bLeft').textContent = left + ' / ' + n + ' left';
+  const top = pad*0.6 + headH + pad*0.5 + (topH ? topH + pad*0.5 : 0);
+  const bottom = pad*0.6 + (botH ? botH + pad*0.5 : pad*0.4);
+  const gl = pad + (at === 'left' ? sideW + pad : 0), gr = pad + (at === 'right' ? sideW + pad : 0);
+  const aw = W - gl - gr, ah = H - top - bottom;
+  const foot = $('bFoot'), topP = $('bTopP');
+  [foot, topP].forEach(el => { el.innerHTML = ''; el.style.cssText = ''; el.classList.add('hidden'); });
+  const pSizeRow = Math.min(lineH * 0.62, ...[topItems, botItems].filter(x => x.length).map(x => (W * 0.92 / perRowFor(x)) / (longest * 0.5 + 2.4)));
+  const fillRow = (el, items, styles) => {
+    if (!items.length) return;
+    el.classList.remove('hidden');
+    const per = perRowFor(items);
+    const spanW = (longest * 0.5 + 1.9) * pSizeRow, colGap = pSizeRow * 0.5;
+    const contW = Math.min(W - pad * 2, per * spanW + (per - 1) * colGap);
+    Object.assign(el.style, styles, {left: ((W - contW) / 2) + 'px', right: 'auto', width: contW + 'px', padding: '0', height: secH(items) + 'px', rowGap: (lineH * 0.2) + 'px', columnGap: colGap + 'px', alignContent: 'center'});
+    items.forEach(p => el.append(h('span', {textContent: p, style: `font-size:${pSizeRow}px;width:${spanW}px;box-sizing:border-box;text-align:center;padding-left:0;padding-right:0`})));
+  };
+  if (side){
+    foot.classList.remove('hidden');
+    const pSize = Math.min((sideW * 0.92) / (longest * 0.47 + 1.7), ah / (prices.length * 2.3), m * 0.06);
+    Object.assign(foot.style, {top: top + 'px', height: ah + 'px', width: sideW + 'px', left: at === 'left' ? pad + 'px' : 'auto', right: at === 'right' ? pad + 'px' : 'auto', flexDirection: 'column', flexWrap: 'nowrap', gap: (pSize * 0.6) + 'px', padding: '0'});
+    prices.forEach(p => foot.append(h('span', {textContent: p, style: 'font-size:' + pSize + 'px;width:100%;text-align:center;white-space:normal'})));
+  } else {
+    fillRow(topP, topItems, {top: (pad*0.6 + headH + pad*0.3) + 'px'});
+    fillRow(foot, botItems, {bottom: pad*0.6 + 'px'});
+  }
+  let tw = (aw - gap*(cols-1)) / cols, th = (ah - gap*(rows-1)) / rows;
+  if (tw > th * 1.45) tw = th * 1.45;
+  if (th > tw * 1.15) th = tw * 1.15;
+  // flex grid: same columns, but a short last row sits centered
+  const gridW = cols * tw + (cols - 1) * gap;
+  const g = $('bGrid'); g.style.left = (gl + (aw - gridW) / 2) + 'px'; g.style.width = gridW + 'px'; g.style.right = 'auto'; g.style.top = top + 'px'; g.style.height = ah + 'px'; g.style.gap = gap + 'px';
+  g.style.setProperty('--tw', tw + 'px'); g.style.setProperty('--th', th + 'px');
+  // keyed tiles so they can slide to their new place
+  const before = new Map(); if (animate) tileEls.forEach((el, id) => { if (el.isConnected) before.set(id, el.getBoundingClientRect()); });
+  for (const [id, el] of tileEls) if (!ids.includes(id)){ el.remove(); tileEls.delete(id); }
+  const order = boardOrder();
+  const lbSize = Math.max(9, Math.min(tw, th) * 0.125);
+  order.forEach(id => {
+    let el = tileEls.get(id);
+    if (!el){ el = h('div'); el.dataset.id = id; el.addEventListener('click', () => toggle(id)); tileEls.set(id, el); }
+    fillTile(el, spotFor(id), !!sold[id], 'st');
+    el.querySelector('.lb').style.fontSize = lbSize + 'px';
+    const b = el.querySelector('.stamp b'); if (b) b.style.fontSize = Math.min(tw, th) * 0.24 + 'px';
+    g.append(el);   // append in order = reorder
+  });
+  if (animate && before.size){
+    tileEls.forEach((el, id) => {
+      const a = before.get(id); if (!a) return; const b = el.getBoundingClientRect();
+      const dx = a.left - b.left, dy = a.top - b.top; if (!dx && !dy) return;
+      el.animate([{transform: `translate(${dx}px, ${dy}px)`}, {transform: 'none'}], {duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)'});
+    });
+  }
+  $('bSort').textContent = 'Sold spots move to the end: ' + (LIVE.soldToEnd === false ? 'Off' : 'On');
+}
+function toggle(id){ if (!LIVE || !id) return; LIVE.sold = LIVE.sold || {}; if (LIVE.sold[id]) delete LIVE.sold[id]; else LIVE.sold[id] = Date.now(); saveLive(); renderBoard(true); }
+let ctlT;
+function showCtl(){ $('bCtl').classList.add('show'); clearTimeout(ctlT); }
+function hideCtlSoon(){ clearTimeout(ctlT); ctlT = setTimeout(() => $('bCtl').classList.remove('show'), 600); }
+$('bHot').addEventListener('mouseenter', showCtl);
+$('bCtl').addEventListener('mouseenter', showCtl);
+$('bCtl').addEventListener('mouseleave', hideCtlSoon);
+$('board').addEventListener('mousemove', e => { if (e.clientY < 14) showCtl(); });
+addEventListener('keydown', e => { if (route().page === 'board' && e.key === 'Escape') $('bCtl').classList.toggle('show'); });
+$('bReset').onclick = () => confirmSheet('Clear all SOLD stamps?', 'Every spot goes back to open, in your original order. Use this to run the same break again.', 'Clear all', () => { LIVE.sold = {}; saveLive(); renderBoard(true); });
+$('bSort').onclick = () => { LIVE.soldToEnd = LIVE.soldToEnd === false; saveLive(); renderBoard(true); };
+$('bEdit').onclick = () => openSheet(sh => {
+  sh.append(h('h2', {textContent: 'This break only'}), h('p', {className: 'muted', textContent: 'Changes the board on this computer now. The saved break stays the same.'}));
+  const t = h('input', {type: 'text', value: LIVE.title}); const p = h('textarea', {value: (LIVE.prices || []).join('\n'), style: 'min-height:110px', placeholder: 'Stash or Pass: 19\nSpin 2 Keep 1: 21'});
+  const pa = pricesAtSelect(LIVE.pricesAt); const ppr = perRowSelect(LIVE.pricesPerRow); const gr = h('input', {type: 'text', value: LIVE.grid || '', placeholder: 'Blank = automatic, or like 8x7'}); const gn = h('div', {className: 'muted', textContent: gridNote(LIVE.grid, LIVE.spotIds.length)}); const msg = h('div', {className: 'msg'});
+  gr.addEventListener('input', () => { gn.textContent = gridNote(gr.value, LIVE.spotIds.length); });
+  sh.append(h('label', {textContent: 'Title'}), t, h('label', {textContent: 'Prices (one per line)'}), p, h('label', {textContent: 'Where the spin options show'}), pa, h('label', {textContent: 'Spin options per row (top and bottom)'}), ppr, h('label', {textContent: 'Grid: across × down'}), gr, gn, msg,
+    h('div', {className: 'row'}, h('button', {className: 'gold', textContent: 'Save', on: {click: () => {
+      if (gr.value.trim() && !parseGrid(gr.value)){ msg.textContent = 'Write the grid like 8x7, or leave it blank.'; msg.classList.add('err'); return; }
+      LIVE.title = t.value.trim() || LIVE.title; LIVE.prices = linesOf(p.value).slice(0, 8); LIVE.grid = gr.value.trim(); LIVE.pricesAt = pa.value; LIVE.pricesPerRow = ppr.value; saveLive(); closeSheet(); renderBoard(); }}}), h('button', {textContent: 'Cancel', on: {click: closeSheet}})));
+});
+addEventListener('resize', () => { if (route().page === 'board') renderBoard(); });
+
+/* ================= routing ================= */
+function route(){ const p = location.hash.replace(/^#\/?/, '').split('/'); return {page: (p[0] === 'f' ? 'breaks' : p[0]) || 'breaks'}; }
+const ui = {bQ: '', sGroup: '', sQ: ''};
+let rq = false;
+function render(){ if (rq) return; rq = true; requestAnimationFrame(() => { rq = false; doRender(); }); }
+function doRender(){
+  const r = route();
+  if (r.page === 'board'){ $('app').classList.add('hidden'); $('board').classList.remove('hidden'); document.body.style.overflow = 'hidden'; if (IX) renderBoard(); return; }
+  $('board').classList.add('hidden'); $('app').classList.remove('hidden'); document.body.style.overflow = '';
+  document.querySelectorAll('nav .tab').forEach(a => a.classList.toggle('on', a.dataset.tab === r.page));
+  const who = $('who'); who.innerHTML = '';
+  if (store.mode === 'local') who.append(h('span', {className: 'muted', textContent: 'Not connected to a team library yet'}));
+  else if (canEdit()) who.append(h('span', {className: 'muted', textContent: 'Team ✓ '}), h('button', {className: 'sm', textContent: 'Sign out', on: {click: () => store.signOut()}}));
+  else who.append(h('button', {className: 'sm gold', textContent: 'Team sign in', on: {click: signInSheet}}));
+  // keep typing focus in search boxes when live updates arrive
+  const act = document.activeElement;
+  if (act && act.dataset && act.dataset.keep && $('view').contains(act)){ const res = $('results'); if (res && res._draw) res._draw(); return; }
+  const v = $('view'); const y = scrollY; v.innerHTML = '';
+  if (!IX){ v.append(h('p', {className: 'muted', textContent: 'Loading the team library…'})); return; }
+  if (r.page === 'spots') pageSpots(v); else if (r.page === 'team') pageTeam(v); else pageBreaks(v);
+  scrollTo(0, y);
+}
+addEventListener('hashchange', () => { closeSheet(); doRender(); if (route().page === 'board'){ showCtl(); hideCtlSoon(); } });
+
+/* ================= Breaks (folders: franchise → set → break style) ================= */
+const NOSET = 'No set';
+const byName = (a, b) => String(a).localeCompare(String(b), undefined, {numeric: true});
+const byNameDesc = (a, b) => byName(b, a);
+const enc = s => encodeURIComponent(s);
+function brList(){ return Object.entries(IX.breaks).map(([id, b]) => ({id, ...b})); }
+function setOf(b){ return b.product || NOSET; }
+function folderPath(){ const p = location.hash.replace(/^#\/?/, '').split('/'); return p[0] === 'f' ? {fr: p[1] ? decodeURIComponent(p[1]) : '', set: p[2] !== undefined ? decodeURIComponent(p[2]) : null} : {fr: '', set: null}; }
+function startBtn(b){ return h('button', {className: 'gold', textContent: 'Start', on: {click: () => { if (LIVE && Object.keys(LIVE.sold || {}).length && LIVE.breakId !== b.id) confirmSheet('Start ' + b.title + '?', 'Your board currently shows ' + LIVE.title + ' with spots marked sold. Starting replaces it.', 'Start', () => startBreak(b.id)); else startBreak(b.id); }}}); }
+function breakRow(b, showPath){
+  return h('div', {className: 'li'},
+    h('div', {className: 'grow'}, h('div', {className: 't', textContent: b.style || b.title}),
+      h('div', {className: 'muted', textContent: (showPath ? [b.franchise, setOf(b)].filter(Boolean).join(' › ') + ' · ' : '') + (b.spotIds || []).length + ' spots' + ((b.prices || []).length ? ' · ' + b.prices.length + ' prices' : '') + (parseGrid(b.grid) ? ' · grid ' + b.grid : '') + (b.title && b.title !== b.style ? ' · shows as "' + b.title + '"' : '') + (b.by ? ' · by ' + b.by : '')})),
+    startBtn(b),
+    h('button', {className: 'sm', textContent: 'Edit', on: {click: () => { if (!needSignIn()) breakSheet(b); }}}),
+    h('button', {className: 'sm', textContent: 'Copy', on: {click: () => { if (!needSignIn()) breakSheet(Object.assign({}, b, {id: null, style: (b.style || b.title) + ' (copy)', title: b.title + ' (copy)'})); }}}),
+    h('button', {className: 'sm', textContent: 'Delete', on: {click: () => { if (needSignIn()) return; confirmSheet('Delete ' + (b.style || b.title) + '?', 'It\'s removed for the whole team. Spots and pictures stay.', 'Delete', () => store.putBreak(b.id, null)); }}}));
+}
+function folderCard(name, sub, href){ return h('a', {className: 'folder', href}, h('div', {className: 'ficon', textContent: '📁'}), h('div', {className: 'grow'}, h('div', {className: 't', textContent: name}), h('div', {className: 'muted', textContent: sub})), h('div', {className: 'chev', textContent: '›'})); }
+function crumbs(fr, set){
+  const c = h('div', {className: 'crumbs'}, h('a', {href: '#/', textContent: 'All breaks'}));
+  if (fr) c.append(' › ', set === null ? h('b', {textContent: fr}) : h('a', {href: '#/f/' + enc(fr), textContent: fr}));
+  if (set !== null) c.append(' › ', h('b', {textContent: set}));
+  return c;
+}
+function renameFolder(kind, fr, set){
+  if (needSignIn()) return;
+  openSheet(sh => {
+    const cur = kind === 'fr' ? fr : set;
+    sh.append(h('h2', {textContent: 'Rename folder'}), h('p', {className: 'muted', textContent: 'Every break inside moves with it, for the whole team.'}));
+    const inp = h('input', {type: 'text', value: cur === NOSET ? '' : cur}); const msg = h('div', {className: 'msg'});
+    sh.append(inp, msg, h('div', {className: 'row'}, h('button', {className: 'gold', textContent: 'Rename', on: {click: async () => {
+      const nv = inp.value.trim(); if (!nv){ msg.textContent = 'Enter a name.'; msg.classList.add('err'); return; }
+      msg.textContent = 'Renaming…';
+      for (const [id, b] of Object.entries(IX.breaks)){
+        if (kind === 'fr' && (b.franchise || 'Other') === fr) await store.putBreak(id, {...b, franchise: nv});
+        if (kind === 'set' && (b.franchise || 'Other') === fr && setOf(b) === set) await store.putBreak(id, {...b, product: nv});
+      }
+      if (kind === 'fr') for (const [id, s] of Object.entries(IX.spots)) if (s.group === fr) await store.putSpot(id, {...s, group: nv});
+      closeSheet(); location.hash = kind === 'fr' ? '#/f/' + enc(nv) : '#/f/' + enc(fr) + '/' + enc(nv);
+    }}}), h('button', {textContent: 'Cancel', on: {click: closeSheet}})));
+  });
+}
+function pageBreaks(v){
+  if (LIVE && LIVE.spotIds && LIVE.spotIds.length){
+    const left = LIVE.spotIds.filter(i => !(LIVE.sold || {})[i]).length;
+    v.append(h('div', {className: 'card'}, h('div', {className: 'bar', style: 'margin:0'}, h('div', {}, h('div', {className: 'muted', textContent: 'On your board now'}), h('div', {style: 'font-weight:600;font-size:17px', textContent: LIVE.title + ' — ' + left + ' of ' + LIVE.spotIds.length + ' left'})), h('a', {className: 'btn gold', href: '#/board', textContent: 'Back to the board'}))));
+  }
+  const {fr, set} = folderPath(); const all = brList();
+  v.append(h('div', {className: 'bar'}, h('h1', {textContent: set !== null ? set : fr || 'Breaks'}),
+    h('div', {className: 'btns'},
+      fr ? h('button', {className: 'sm', textContent: 'Rename folder', on: {click: () => renameFolder(set !== null ? 'set' : 'fr', fr, set)}}) : null,
+      h('button', {className: 'gold', textContent: '+ New break', on: {click: () => { if (!needSignIn()) breakSheet({franchise: fr, product: set && set !== NOSET ? set : ''}, true); }}}))));
+  if (fr) v.append(crumbs(fr, set));
+  const q = h('input', {type: 'search', placeholder: 'Search all breaks', value: ui.bQ}); q.dataset.keep = '1';
+  const res = h('div', {id: 'results'});
+  res._draw = () => {
+    ui.bQ = q.value; res.innerHTML = ''; const all2 = brList(); const term = q.value.trim().toLowerCase();
+    if (term){
+      const hits = all2.filter(b => [b.title, b.style, b.franchise, b.product].join(' ').toLowerCase().includes(term)).sort((a, b) => byName(a.franchise || '', b.franchise || '') || byNameDesc(setOf(a), setOf(b)) || byName(a.style || a.title, b.style || b.title));
+      const list = h('div', {className: 'list'}); hits.forEach(b => list.append(breakRow(b, true)));
+      res.append(hits.length ? list : h('p', {className: 'muted', textContent: 'No breaks match.'})); return;
+    }
+    if (!all2.length){ res.append(h('p', {className: 'muted', textContent: 'No breaks yet. Click + New break and paste the spot list from a Canva board.'})); return; }
+    if (!fr){
+      const frs = [...new Set(all2.map(b => b.franchise || 'Other'))].sort(byName);
+      const grid = h('div', {className: 'folders'});
+      frs.forEach(f => { const inF = all2.filter(b => (b.franchise || 'Other') === f); const sets = new Set(inF.map(setOf)); grid.append(folderCard(f, sets.size + (sets.size === 1 ? ' set · ' : ' sets · ') + inF.length + (inF.length === 1 ? ' break' : ' breaks'), '#/f/' + enc(f))); });
+      res.append(grid); return;
+    }
+    const inF = all2.filter(b => (b.franchise || 'Other') === fr);
+    if (set === null){
+      const sets = [...new Set(inF.map(setOf))].sort((a, b) => a === NOSET ? 1 : b === NOSET ? -1 : byNameDesc(a, b));
+      if (!sets.length){ res.append(h('p', {className: 'muted', textContent: 'This folder is empty.'})); return; }
+      const grid = h('div', {className: 'folders'});
+      sets.forEach(s => { const n = inF.filter(b => setOf(b) === s).length; grid.append(folderCard(s, n + (n === 1 ? ' break style' : ' break styles'), '#/f/' + enc(fr) + '/' + enc(s))); });
+      res.append(grid); return;
+    }
+    const inS = inF.filter(b => setOf(b) === set).sort((a, b) => byName(a.style || a.title, b.style || b.title));
+    if (!inS.length){ res.append(h('p', {className: 'muted', textContent: 'This folder is empty.'})); return; }
+    const list = h('div', {className: 'list'}); inS.forEach(b => list.append(breakRow(b, false))); res.append(list);
+  };
+  q.addEventListener('input', res._draw); v.append(q, h('div', {style: 'height:12px'}), res); res._draw();
+}
+function breakSheet(b, prefillOnly){
+  const isNew = !b || !b.id; const all = brList();
+  openSheet(sh => {
+    sh.append(h('h2', {textContent: isNew ? 'New break' : 'Edit break'}));
+    const mkList = (id, vals) => { const dl = h('datalist', {id}); [...new Set(vals.filter(Boolean))].sort(byName).forEach(x => dl.append(h('option', {value: x}))); return dl; };
+    const fr = h('input', {type: 'text', value: (b && b.franchise) || '', placeholder: 'Disney, Star Wars, Marvel…', list: 'frlist'});
+    const pr = h('input', {type: 'text', value: (b && b.product) || '', placeholder: '2025 Hyperspace, 2026 Chrome…', list: 'prlist'});
+    const st = h('input', {type: 'text', value: (b && b.style) || '', placeholder: 'Hobby Box, 5 Box Mixer, Sapphire Case…', list: 'stlist'});
+    const t = h('input', {type: 'text', value: (b && !prefillOnly && b.title) || '', placeholder: 'Leave blank to use the set and break style'});
+    const prList = h('datalist', {id: 'prlist'}); const refreshPr = () => { prList.innerHTML = ''; [...new Set(all.filter(x => (x.franchise || '') === fr.value.trim()).map(x => x.product).filter(Boolean))].sort(byNameDesc).forEach(x => prList.append(h('option', {value: x}))); };
+    fr.addEventListener('input', refreshPr); refreshPr();
+    const spots = h('textarea', {value: b && b.spotIds ? b.spotIds.map(id => spotFor(id).name).join('\n') : '', placeholder: 'One spot per line, in board order:\nDarth Vader\nLuke Skywalker\nKenobi', style: 'min-height:190px'});
+    const prices = h('textarea', {value: b && b.prices ? b.prices.join('\n') : '', placeholder: 'Stash or Pass: 19\nSpin 2 Keep 1: 21', style: 'min-height:100px'});
+    const pAt = pricesAtSelect(b && b.pricesAt); const pPer = perRowSelect(b && b.pricesPerRow);
+    const grid = h('input', {type: 'text', value: (b && b.grid) || '', placeholder: 'Like 8x7 or 7x8'});
+    const gnote = h('div', {className: 'muted'}); const upd = () => { gnote.textContent = gridNote(grid.value, linesOf(spots.value).length); };
+    grid.addEventListener('input', upd); spots.addEventListener('input', upd); upd();
+    const msg = h('div', {className: 'msg'});
+    sh.append(h('label', {textContent: 'Franchise folder'}), fr, mkList('frlist', all.map(x => x.franchise)),
+      h('label', {textContent: 'Set / product folder'}), pr, prList,
+      h('label', {textContent: 'Break style'}), st, mkList('stlist', all.map(x => x.style)),
+      h('label', {textContent: 'Title shown on stream'}), t,
+      h('label', {textContent: 'Spots, one per line, BEST first. The board fills top-left to bottom-right in this order. Use " / " to put two titles on one spot.'}), spots,
+      h('label', {textContent: 'Spin options / prices, one per line'}), prices,
+      h('label', {textContent: 'Where the spin options show'}), pAt,
+      h('label', {textContent: 'Spin options per row (top and bottom)'}), pPer,
+      h('label', {textContent: 'Grid: across × down (blank = automatic)'}), grid, gnote, msg);
+    const save = h('button', {className: 'gold', textContent: 'Save break'});
+    save.onclick = async () => {
+      const F = fr.value.trim(), P = pr.value.trim(), S = st.value.trim(); const names = linesOf(spots.value);
+      const title = t.value.trim() || [P, S].filter(Boolean).join(' ') + (S && !/break$/i.test(S) ? ' Break' : '');
+      if (!F){ msg.textContent = 'Pick a franchise folder, like Disney or Star Wars.'; msg.classList.add('err'); return; }
+      if (!S){ msg.textContent = 'Give it a break style, like Hobby Box or Sapphire Case.'; msg.classList.add('err'); return; }
+      if (!names.length){ msg.textContent = 'Add at least one spot.'; msg.classList.add('err'); return; }
+      if (grid.value.trim() && !parseGrid(grid.value)){ msg.textContent = 'Write the grid like 8x7 (across × down), or leave it blank.'; msg.classList.add('err'); return; }
+      const ids = names.map(slug); const dup = ids.find((s, i) => ids.indexOf(s) !== i);
+      if (dup){ msg.textContent = 'This spot is listed twice: ' + names[ids.indexOf(dup)]; msg.classList.add('err'); return; }
+      save.disabled = true; msg.classList.remove('err'); msg.textContent = 'Saving…';
+      try {
+        for (let i = 0; i < names.length; i++) if (!IX.spots[ids[i]]) await store.putSpot(ids[i], {name: names[i], group: F, v: 0});
+        const id = isNew ? slug(F + '-' + P + '-' + S) + '-' + Date.now().toString(36) : b.id;
+        await store.putBreak(id, {title, franchise: F, product: P, style: S, spotIds: ids, prices: linesOf(prices.value).slice(0, 8), grid: grid.value.trim(), pricesAt: pAt.value, pricesPerRow: pPer.value, updatedAt: Date.now()});
+        closeSheet(); toast('Saved for the team in ' + [F, P || NOSET].join(' › '));
+        location.hash = '#/f/' + enc(F) + '/' + enc(P || NOSET);
+      } catch(e){ save.disabled = false; msg.textContent = 'Couldn\'t save. Check your internet and try again.'; msg.classList.add('err'); }
+    };
+    sh.append(h('div', {className: 'row'}, save, h('button', {textContent: 'Cancel', on: {click: closeSheet}})));
+  });
+}
+
+/* ================= Spots & pictures ================= */
+function groupsOf(items){ return [...new Set(items.map(x => x.group).filter(Boolean))].sort(byName); }
+function chipRow(groups, current, onPick){ const row = h('div', {className: 'chips'}); [''].concat(groups).forEach(g => row.append(h('button', {className: 'chip' + (g === current ? ' on' : ''), textContent: g || 'All', on: {click: () => onPick(g)}}))); return row; }
+function pageSpots(v){
+  const all = Object.entries(IX.spots).map(([id, s]) => ({id, ...s}));
+  const missing = all.filter(s => !s.v).length;
+  v.append(h('div', {className: 'bar'}, h('h1', {textContent: 'Spots & pictures'}), h('button', {className: 'gold', textContent: 'Add pictures', on: {click: () => { if (!needSignIn()) bulkSheet(); }}})));
+  v.append(h('p', {className: 'muted', style: 'margin-top:0', textContent: all.length ? `${all.length} spots, ${missing} still need a picture. Every break that uses a spot shows its picture, for the whole team.` : 'Spots are added when someone saves a break.'}));
+  if (!all.length) return;
+  v.append(chipRow(groupsOf(all), ui.sGroup, g => { ui.sGroup = g; render(); }));
+  const q = h('input', {type: 'search', placeholder: 'Search spots', value: ui.sQ}); q.dataset.keep = '1';
+  const res = h('div', {className: 'grid', id: 'results'});
+  res._draw = () => { ui.sQ = q.value; res.innerHTML = ''; const term = q.value.toLowerCase();
+    const shown = Object.entries(IX.spots).map(([id, s]) => ({id, ...s})).filter(s => (!ui.sGroup || s.group === ui.sGroup) && (!term || s.name.toLowerCase().includes(term))).sort((a, b) => byName(a.name, b.name));
+    shown.forEach(s => { const el = fillTile(h('div'), s, false, 'tile'); el.addEventListener('click', () => { if (!needSignIn()) spotSheet(s.id); }); res.append(el); });
+    ensureImages(shown.map(s => s.id)); };
+  q.addEventListener('input', res._draw); v.append(q, h('div', {style: 'height:10px'}), res); res._draw();
+}
+async function setPicture(id, img){
+  const s = IX.spots[id]; if (!s) return;
+  await store.putImage(id, img);
+  const v = img ? Date.now() : 0;
+  IMG[id] = {v, img: img || ''};
+  await store.putSpot(id, {...s, v});
+}
+function spotSheet(id){
+  const s = IX.spots[id]; if (!s) return;
+  const used = Object.values(IX.breaks).filter(b => (b.spotIds || []).includes(id));
+  openSheet(sh => {
+    sh.append(h('h2', {textContent: s.name}), h('p', {className: 'muted', textContent: used.length ? 'Used in: ' + used.map(b => b.title).join(', ') : 'Not used in any break.'}));
+    const img = imgFor(id); if (img) sh.append(h('img', {className: 'prev', src: img, alt: ''}));
+    const msg = h('div', {className: 'msg'});
+    sh.append(h('div', {className: 'row'},
+      h('button', {className: 'gold', textContent: s.v ? 'Change picture' : 'Add picture', on: {click: () => { $('fileOne').onchange = async ev => { const f = ev.target.files[0]; ev.target.value = ''; if (!f) return; msg.textContent = 'Uploading…'; try { await setPicture(id, await resizeImage(f)); closeSheet(); toast('Picture saved for the team'); } catch(e){ msg.textContent = 'That picture didn\'t upload. Try a JPG or PNG.'; msg.classList.add('err'); } }; $('fileOne').click(); }}}),
+      s.v ? h('button', {textContent: 'Remove picture', on: {click: async () => { await setPicture(id, null); closeSheet(); }}}) : null), msg);
+    sh.append(h('div', {className: 'row'},
+      h('button', {textContent: 'Delete spot', disabled: used.length > 0, title: used.length ? 'Remove it from its breaks first' : '', on: {click: () => confirmSheet('Delete ' + s.name + '?', 'This removes the spot and its picture for the whole team.', 'Delete', async () => { await store.putImage(id, null); await store.putSpot(id, null); })}}),
+      h('button', {textContent: 'Close', on: {click: closeSheet}})));
+  });
+}
+function matchSpot(filename){
+  const f = norm(filename); if (!f) return null; let best = null, bestLen = 0;
+  for (const [id, s] of Object.entries(IX.spots)){
+    for (const p of [s.name, ...String(s.name).split(' / ')].map(norm)){ if (!p) continue; if (f === p) return id; if ((f.includes(p) || p.includes(f)) && Math.min(p.length, f.length) >= 4 && p.length > bestLen){ best = id; bestLen = p.length; } }
+  }
+  return best;
+}
+function bulkSheet(){
+  openSheet(sh => {
+    sh.append(h('h2', {textContent: 'Add pictures in bulk'}), h('p', {className: 'muted', textContent: 'Choose many images at once. Each is matched to a spot by its file name, so name them after the spot: "kenobi.jpg", "toy-story.png". For a shared spot either title works ("brave.jpg" goes to Enchanted / Brave). Pictures are shrunk automatically and show up for the whole team.'}));
+    const msg = h('div', {className: 'msg'});
+    sh.append(h('div', {className: 'row'}, h('button', {className: 'gold', textContent: 'Choose images', on: {click: () => { $('fileBulk').onchange = async ev => {
+      const files = [...ev.target.files]; ev.target.value = ''; if (!files.length) return; let ok = 0; const missed = [];
+      for (const f of files){ const id = matchSpot(f.name); if (!id){ missed.push(f.name); continue; } msg.textContent = `Uploading ${ok + 1} of ${files.length}…`; try { await setPicture(id, await resizeImage(f)); ok++; } catch(e){ missed.push(f.name + ' (failed)'); } }
+      msg.textContent = `${ok} picture${ok === 1 ? '' : 's'} added.` + (missed.length ? ' Not matched: ' + missed.join(', ') + '. Rename them, or add them from the spot itself.' : '');
+    }; $('fileBulk').click(); }}}), h('button', {textContent: 'Close', on: {click: closeSheet}})), msg);
+  });
+}
+
+/* ================= Team page: status, backup, import ================= */
+function pageTeam(v){
+  const nb = Object.keys(IX.breaks).length, ns = Object.keys(IX.spots).length, np = Object.values(IX.spots).filter(s => s.v).length;
+  v.append(h('h1', {textContent: 'Team'}));
+  v.append(h('div', {className: 'card'}, h('div', {style: 'font-weight:600;font-size:16px', textContent: `${nb} breaks · ${ns} spots · ${np} pictures`}),
+    h('div', {className: 'muted', textContent: store.mode === 'team' ? 'Shared with your whole team. Anyone signed in with the team password can add or change boards, and everyone sees changes right away.' : 'This library is only on this computer because the team database isn\'t set up yet. Follow SETUP.html to connect it.'})));
+  if (store.mode === 'team') v.append(h('div', {className: 'btns', style: 'margin-bottom:8px'}, canEdit() ? h('button', {textContent: 'Sign out of the team', on: {click: () => store.signOut()}}) : h('button', {className: 'gold', textContent: 'Team sign in', on: {click: signInSheet}})));
+  v.append(h('h2', {textContent: 'Backup'}), h('p', {className: 'muted', textContent: 'Downloads every break, spot and picture as one file. Keep a copy now and then.'}),
+    h('button', {textContent: 'Download backup', on: {click: downloadBackup}}));
+  v.append(h('h2', {textContent: 'Bring in a library file'}), h('p', {className: 'muted', textContent: 'Adds the breaks, spots and pictures from a backup or an older Break Board library.json. Breaks with the same name are updated, and nothing gets deleted.'}),
+    h('button', {textContent: 'Choose library file', on: {click: () => { if (!needSignIn()) importFile(); }}}));
+}
+async function downloadBackup(){
+  toast('Preparing backup…');
+  const ids = Object.keys(IX.spots); let imgs = {};
+  try { imgs = await store.getImages(ids.filter(id => IX.spots[id].v)); } catch(e){}
+  const out = {format: 'breakboard-library', version: 2, exportedAt: Date.now(), spots: {}, breaks: IX.breaks};
+  ids.forEach(id => out.spots[id] = {name: IX.spots[id].name, group: IX.spots[id].group || '', img: imgs[id] || ''});
+  const a = h('a', {href: URL.createObjectURL(new Blob([JSON.stringify(out)], {type: 'application/json'})), download: 'breakboard-backup-' + new Date().toISOString().slice(0, 10) + '.json'});
+  document.body.append(a); a.click(); a.remove();
+}
+function importFile(){
+  $('fileLib').onchange = async ev => {
+    const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+    let j; try { j = JSON.parse(await f.text()); if (!j.spots || !j.breaks) throw 0; } catch(e){ toast('That isn\'t a Break Board library file.', true); return; }
+    openSheet(sh => { sh.append(h('h2', {textContent: 'Bringing in your library…'}), h('p', {className: 'muted', id: 'impMsg', textContent: 'Starting…'})); });
+    const say = t => { const m = $('impMsg'); if (m) m.textContent = t; };
+    try {
+      const sids = Object.keys(j.spots); let i = 0;
+      for (const id of sids){ i++; const s = j.spots[id]; say(`Spots ${i} of ${sids.length}…`);
+        const cur = IX.spots[id];
+        if (s.img){ await store.putImage(id, s.img); IMG[id] = {v: Date.now(), img: s.img}; }
+        await store.putSpot(id, {name: s.name, group: s.group || (cur && cur.group) || '', v: s.img ? IMG[id].v : (cur ? cur.v || 0 : 0)});
+      }
+      const bids = Object.keys(j.breaks); i = 0;
+      for (const id of bids){ i++; const b = j.breaks[id]; say(`Breaks ${i} of ${bids.length}…`);
+        await store.putBreak(id, {title: b.title, franchise: b.franchise || b.group || 'Other', product: b.product || '', style: b.style || b.title, spotIds: b.spotIds || [], prices: b.prices || [], grid: b.grid || '', pricesAt: b.pricesAt || 'bottom', pricesPerRow: b.pricesPerRow || '', updatedAt: Date.now()});
+      }
+      closeSheet(); toast(`Added ${bids.length} breaks and ${sids.length} spots`);
+    } catch(e){ say('Stopped partway — check your internet and try again. Anything already added is kept.'); }
+  };
+  $('fileLib').click();
+}
+
+/* ================= boot ================= */
+store.onAuth(() => render());
+store.onIndex(ix => {
+  if (!ix){ if (!IX){ IX = {spots: {}, breaks: {}}; } render(); return; }
+  IX = ix; render();
+});
+render();
+})();
+</script>
+
+</body>
+</html>
